@@ -13,6 +13,12 @@ use serde_json::{Value};
 
 type Result<T> = std::result::Result<T, String>;
 
+fn print_line() {  
+// Печатаем строку          
+    let line = [b'='; 68];
+    println!("{}", str::from_utf8(&line).unwrap()); 
+}
+
 fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
 // Диалог при ошибке о продолжении работы 
 
@@ -26,12 +32,13 @@ fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
         Some(expr) => code = expr,
         None => return Err(format!("Не смог разобрать ответ от команды \"{}\". Не могу найти поле \"code\" в структуре JSON формата...\n\n{}", text_cmd, buffer).to_owned()),
     }
-    if vec![200, 201, 202, 203, 204].into_iter().find(|&x| x == code) != Some(code) {    
-        println!("===================================================================");
-        println!("=      Произошла фатальная ошибка!!! Продолжить выполнение?       =");
-        println!("===================================================================");
+    if vec![200, 201, 202, 203, 204].into_iter().find(|&x| x == code) != Some(code) {
+
+        print_line();
+        println!("\tПроизошла фатальная ошибка!!! Продолжить выполнение?");
+        print_line();
         println!("Ответ на команду: \"{}\"\n\tсодержит ошибку {}.", &text_cmd, code);
-        println!("===================================================================");
+        print_line();
         print!("Введите да или нет: ");
         let _ = io::stdout().flush();
         loop {            
@@ -109,8 +116,18 @@ fn main() {
     let reader = BufReader::new(f);
     for line in reader.lines() {
         // Проверим не комментарий ли это
-        let buffer = String::from(line.unwrap());
-        if buffer.chars().next().unwrap() != '#' {
+        let buffer;
+        match line {
+            Ok(expr) => {
+                            buffer = String::from(expr.trim());
+                            if buffer.is_empty() {
+                                continue;
+                            }
+                        },
+            Err(_) => continue,
+        }
+        // Ок, отправляем
+        if buffer.trim().chars().next().unwrap() != '#' {
             match telnet(host, &buffer) {
                 Ok(expr) => if expr {
                                 println!("> Команда выполнена успешно");
@@ -123,5 +140,8 @@ fn main() {
     }    
 
     // Завершаем работу
-    println!("> Все тесты пройдены успешно!!!");
+    println!();
+    print_line();
+    println!("\t\tВсе тесты пройдены успешно!!!");
+    print_line();
 }
