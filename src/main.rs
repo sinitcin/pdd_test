@@ -108,15 +108,19 @@ fn main() {
     let f = File::open(file).unwrap();
     let reader = BufReader::new(f);
     for line in reader.lines() {
-        match telnet(host, &line.unwrap()) {
-            Ok(expr) => if expr {
-                            println!("> Команда выполнена успешно");
-                        } else {
-                            println!("> Произошла ошибка при выполнении команды");
-                        },
-            Err(expr) => panic!("{}", expr),
-        };
-    }
+        // Проверим не комментарий ли это
+        let buffer = String::from(line.unwrap());
+        if buffer.chars().next().unwrap() != '#' {
+            match telnet(host, &buffer) {
+                Ok(expr) => if expr {
+                                println!("> Команда выполнена успешно");
+                            } else {
+                                println!("> Произошла ошибка при выполнении команды");
+                            },
+                Err(expr) => panic!("{}", expr),
+            }
+        }
+    }    
 
     // Завершаем работу
     println!("> Все тесты пройдены успешно!!!");
