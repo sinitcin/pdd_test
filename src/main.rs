@@ -118,29 +118,23 @@ fn main() {
     // Чтение комманд из файла
     let f = File::open(file).unwrap();
     let reader = BufReader::new(f);
-    for line in reader.lines() {
-        // Проверим не комментарий ли это
-        let buffer;
-        match line {
-            Ok(expr) => {
-                            buffer = String::from(expr.trim());
-                            if buffer.is_empty() {
-                                continue;
-                            }
+    for line in reader.lines().map(|l| l.unwrap()) {        
+
+        // Проверим на комментарии или пустые строки
+        match line.trim().chars().next() {
+            Some(expr) => if '#' == expr {
+                            continue;
                         },
-            Err(_) => continue,
+            None => continue,
         }
-        // Ок, отправляем
-        if buffer.trim().chars().next().unwrap() != '#' {
-            match telnet(host, &buffer) {
-                Ok(expr) => if expr {
-                                println!("> Команда выполнена успешно");
-                            } else {
-                                println!("> Произошла ошибка при выполнении команды");
-                                available_error = true;
-                            },
-                Err(expr) => panic!("{}", expr),
-            }
+        match telnet(host, &line) {
+            Ok(expr) => if expr {
+                            println!("> Команда выполнена успешно");
+                        } else {
+                            println!("> Произошла ошибка при выполнении команды");
+                            available_error = true;
+                        },
+            Err(expr) => panic!("{}", expr),
         }
     }    
 
