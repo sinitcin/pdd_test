@@ -21,7 +21,7 @@ fn print_line() {
 
 fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
 // Диалог при ошибке о продолжении работы 
-
+    let mut result = true;
     let v: Value;
     match serde_json::from_str(&buffer) {
         Ok(expr) => v = expr,
@@ -45,7 +45,10 @@ fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
             let mut input = String::new();
             io::stdin().read_line(&mut input).unwrap();
             match input.to_lowercase().trim() {
-                "да" | "yes" | "y" => break,
+                "да" | "yes" | "y" => {
+                    result = false;
+                    break;
+                },
                 "нет" | "no" | "n" => return Err(format!("Тест не пройден, ошибка в запросе {} ", &text_cmd).to_owned()),
                 _ => {
                     println!("Вы ввели не корректное значение, попробуйте снова: ");
@@ -54,7 +57,7 @@ fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
             }
         }
     }
-    Ok(true)
+    Ok(result)
 }
 
 fn telnet(host: &str, text_cmd: &str) -> Result<bool> {
@@ -111,6 +114,7 @@ fn main() {
     let file = matches.value_of("file").unwrap_or("commands.txt");
     println!("> Хост команд:\t{}\n> Файл команд:\t{}", host, file);
 
+    let mut available_error = false;
     // Чтение комманд из файла
     let f = File::open(file).unwrap();
     let reader = BufReader::new(f);
@@ -133,6 +137,7 @@ fn main() {
                                 println!("> Команда выполнена успешно");
                             } else {
                                 println!("> Произошла ошибка при выполнении команды");
+                                available_error = true;
                             },
                 Err(expr) => panic!("{}", expr),
             }
@@ -142,6 +147,10 @@ fn main() {
     // Завершаем работу
     println!();
     print_line();
-    println!("\t\tВсе тесты пройдены успешно!!!");
+    if available_error {
+        println!("\t\tЕСТЬ ОШИБКИ ПО ТЕСТАМ!!!");
+    } else {
+        println!("\t\tВсе тесты пройдены успешно!!!");
+    }
     print_line();
 }
