@@ -1,0 +1,64 @@
+
+#
+# Отчищаем БД перед набором инструкций
+#
+{action: "delete", resource: "database"}
+# 
+# Создаём канал связи
+# 
+{action: "create", className: "TCOMChannel", id: "1"}
+
+# 
+# Создаём интерфейс пульсар
+# 
+{action: "create", className: "TPulsarInterface", parentId: 1}
+# 
+# Создаём регистратор
+# 
+{action: "create", className: "TPulsarImpulse16Registrator", parentId: 2}
+# 
+# Создаём устройства на пульсаре
+# 
+{action: "create", className: "TPulsar16M_ColdWaterCounter", parentId: 3} 
+{action: "create", className: "TPulsar16M_TeploCounter", parentId: 3}
+# 
+# Создаём регистратор ВКТ7 на интерфейсе пульсара
+# 
+{action: "create", className: "TVKT7Registrator", parentId: 2}
+# 
+# Создаём устройства на Пульсар на регистраторе ВКТ7
+# 
+{action: "create", className: "TPulsar16M_TeploCounter", parentId: 6}
+# 
+# Смотрим что получилось
+# 
+#
+{action: "create", className: "TCOMChannel", id: "10"}
+{action: "create", className: "TOrion_RS485_Interface", parentId: 10}
+{action: "create", className: "TBolid_WasteWater_Counter", parentId: 8}
+{action: "create", className: "TBolid_ColdWater_Counter", parentId: 8}
+{action: "create", className: "TBolid_HotWater_Counter", parentId: 8}
+{action: "create", className: "TBolid_Electro_Counter", parentId: 8}
+{action: "create", className: "TBolid_Gas_Counter", parentId: 8}
+# 
+# Меняем номер ком порта
+#
+{action: "update", id: "1", data: {field_2: "COM3"} }
+
+# 
+# Меняем свойства активности ком порта
+#
+{action: "update", id: "1", data: {field_1: "Да"} }
+
+# 
+# Меняем свойства активности и серийного номера
+# 
+{action: "update", id: "11", data: {field_5: "Да", field_13: "24"} }
+
+
+
+
+
+
+
+

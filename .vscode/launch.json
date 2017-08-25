@@ -5,7 +5,7 @@
             "name": "Debug",
             "type": "gdb",
             "request": "launch",
-            "target": "./target/debug/pdd_test.exe",
+            "target": "target/debug/pdd_test",
             "cwd": "${workspaceRoot}"
         }
     ]
