@@ -81,9 +81,13 @@ fn telnet(host: &str, text_cmd: &str) -> Result<bool> {
     let _ = stream.write_all(command);
 
     // Получение ответа
-    let mut buffer = String::from("");
-    let _ = stream.read_to_string(&mut buffer); 
-    println!("\nПолучаем ответ:\n{}\n", &buffer);
+    let request_size;
+    let mut buffer = String::new();
+    match stream.read_to_string(&mut buffer) {
+        Ok(expr) => request_size = expr,
+        Err(_) => return Err("Ответ от прибора не является валидной UTF-8 строкой...".to_owned()),
+    }
+    println!("\nПолучаем ответ размером {} байт:\n{}\n", request_size, &buffer);
 
     // Проверка результата
     let result = err_interactive(&buffer, &text_cmd)?;
