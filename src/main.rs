@@ -7,7 +7,6 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::fs::File;
 use std::net::TcpStream;
-use std::slice;
 use std::str;
 use serde_json::{Value};
 
@@ -62,14 +61,6 @@ fn err_interactive(buffer: &str, text_cmd: &str) -> Result<bool> {
 
 fn telnet(host: &str, text_cmd: &str) -> Result<bool> {
 // Эмуляция телнета
-    
-    // Преобразуем строку в массив байт для отправки
-    let ptr = text_cmd.as_ptr();
-    let len = text_cmd.len();
-    let command = unsafe {    
-        let slice = slice::from_raw_parts(ptr, len);
-        slice
-    };
 
     // Отправка команды 
     let mut stream;
@@ -78,7 +69,7 @@ fn telnet(host: &str, text_cmd: &str) -> Result<bool> {
         Err(_) => return Err("Не могу подключиться к УСПД".to_owned()),
     }
     println!("\nОтправляем команду:\n{}", &text_cmd);
-    let _ = stream.write_all(command);
+    let _ = stream.write_all(text_cmd.as_bytes());
 
     // Получение ответа
     let request_size;
