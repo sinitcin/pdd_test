@@ -105,7 +105,7 @@ fn main() {
         .get_matches();
 
     // Получили параметры
-    let host = matches.value_of("host").unwrap_or("127.0.0.1:8080");
+    let host = matches.value_of("host").unwrap_or("127.0.0.1:8080"); //unwrap_or("192.168.201.26:8080");
     let file = matches.value_of("file").unwrap_or("commands.txt");
     println!("> Хост команд:\t{}\n> Файл команд:\t{}", host, file);
 
